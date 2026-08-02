@@ -19,7 +19,7 @@ public class SettingsServiceTests : IDisposable
         var service = new SettingsService(FilePath());
         var settings = service.Load();
         Assert.Equal("Large", settings.FontSize);
-        Assert.True(settings.SaveFolder.Contains("抖音下载"));
+        Assert.Contains("抖音下载", settings.SaveFolder);
     }
 
     [Fact]
