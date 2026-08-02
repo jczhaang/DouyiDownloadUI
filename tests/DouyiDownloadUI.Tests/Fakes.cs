@@ -64,3 +64,9 @@ internal sealed class FakeEngine : IDownloadEngine
         return Task.FromResult(DownloadResult);
     }
 }
+
+internal sealed class FakeClipboard : IClipboardService
+{
+    public string? Text { get; set; }
+    public string? GetText() => Text;
+}
