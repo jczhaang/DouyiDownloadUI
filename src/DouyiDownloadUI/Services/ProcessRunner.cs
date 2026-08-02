@@ -28,9 +28,17 @@ public sealed class ProcessRunner : IProcessRunner
             ?? throw new InvalidOperationException("进程启动失败");
         var stdoutTask = ReadLinesAsync(process.StandardOutput, onStdoutLine, ct);
         var stderrTask = ReadLinesAsync(process.StandardError, onStderrLine, ct);
-        await Task.WhenAll(stdoutTask, stderrTask);
-        await process.WaitForExitAsync(ct);
-        return process.ExitCode;
+        try
+        {
+            await Task.WhenAll(stdoutTask, stderrTask);
+            await process.WaitForExitAsync(ct);
+            return process.ExitCode;
+        }
+        catch (OperationCanceledException)
+        {
+            TryKill(process);
+            throw;
+        }
     }
 
     private static async Task ReadLinesAsync(
@@ -42,6 +50,25 @@ public sealed class ProcessRunner : IProcessRunner
         while ((line = await reader.ReadLineAsync(ct)) is not null)
         {
             onLine?.Invoke(line);
+        }
+    }
+
+    private static void TryKill(Process process)
+    {
+        try
+        {
+            process.Kill(entireProcessTree: true);
+            process.WaitForExit(5000);
+        }
+        catch (InvalidOperationException)
+        {
+            // 进程可能已自行退出
+        }
+        catch (NotSupportedException)
+        {
+        }
+        catch (System.ComponentModel.Win32Exception)
+        {
         }
     }
 }
