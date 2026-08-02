@@ -67,6 +67,7 @@ public sealed partial class MainViewModel : ObservableObject
     public bool StepIsPaste => CurrentStep == Step.Paste;
     public bool StepIsName => CurrentStep == Step.Name;
     public bool StepIsDone => CurrentStep == Step.Done;
+    public bool StepIsNameOrDone => CurrentStep is Step.Name or Step.Done;
 
     public MainViewModel(IDownloadEngine engine, SettingsService settings, IClipboardService clipboard)
     {
@@ -88,6 +89,7 @@ public sealed partial class MainViewModel : ObservableObject
         OnPropertyChanged(nameof(StepIsPaste));
         OnPropertyChanged(nameof(StepIsName));
         OnPropertyChanged(nameof(StepIsDone));
+        OnPropertyChanged(nameof(StepIsNameOrDone));
     }
 
     public void OnWindowActivated()
@@ -129,7 +131,8 @@ public sealed partial class MainViewModel : ObservableObject
         StatusMessage = "正在读取视频信息…";
         try
         {
-            var meta = await _engine.GetMetadataAsync(_extractedUrl, CancellationToken.None);
+            using var timeout = new CancellationTokenSource(TimeSpan.FromSeconds(30));
+            var meta = await _engine.GetMetadataAsync(_extractedUrl, timeout.Token);
             if (meta is null)
             {
                 ErrorMessage = "读取视频信息失败，请检查网络或链接";
@@ -163,7 +166,7 @@ public sealed partial class MainViewModel : ObservableObject
     {
         if (string.IsNullOrWhiteSpace(FileName))
         {
-            ErrorMessage = "文件名不能为空";
+            ErrorMessage = "标题不能为空";
             return;
         }
         if (!int.TryParse(Number, out var number) || number <= 0)
@@ -178,10 +181,12 @@ public sealed partial class MainViewModel : ObservableObject
         ProgressPercent = 0;
         ProgressText = "准备中…";
         _cts = new CancellationTokenSource();
+        var ext = mode == DownloadMode.Audio ? "mp3" : "mp4";
+        var fullName = FilenameBuilder.BuildFileName(Number, Type, FileName, ext);
         var request = new DownloadRequest(
             _extractedUrl,
             _config.SaveFolder,
-            FilenameBuilder.Sanitize(FileName),
+            Path.GetFileNameWithoutExtension(fullName),
             mode);
         var progress = new Progress<DownloadProgress>(p =>
         {
@@ -263,6 +268,33 @@ public sealed partial class MainViewModel : ObservableObject
         catch (Exception)
         {
             ErrorMessage = "打开文件夹失败";
+        }
+    }
+
+    public void OpenRecent(RecentDownloadEntry? entry)
+    {
+        if (entry is null || string.IsNullOrWhiteSpace(entry.FilePath)) return;
+        try
+        {
+            if (File.Exists(entry.FilePath))
+            {
+                Process.Start(new ProcessStartInfo("explorer.exe", $"/select,\"{entry.FilePath}\"")
+                {
+                    UseShellExecute = true
+                });
+            }
+            else
+            {
+                System.Windows.MessageBox.Show(
+                    "文件已被移动或删除，可在下载文件夹中查找",
+                    "提示",
+                    System.Windows.MessageBoxButton.OK,
+                    System.Windows.MessageBoxImage.Information);
+            }
+        }
+        catch (Exception)
+        {
+            ErrorMessage = "打开文件位置失败";
         }
     }
 

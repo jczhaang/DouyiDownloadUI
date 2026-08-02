@@ -70,8 +70,9 @@ public class MainViewModelTests : IDisposable
     public async Task Download_Video_Goes_To_Done_And_Remembers_Number_And_Type()
     {
         _engine.Metadata = new VideoMetadata("广场舞教学");
-        var file = Path.Combine(_dir, "001 中三 广场舞教学.mp4");
-        _engine.DownloadResult = new DownloadResult(true, file, DownloadErrorKind.None, null);
+        var expectedName = FilenameBuilder.BuildFileName("007", "中三", "广场舞教学", "mp4");
+        _engine.DownloadResult = new DownloadResult(
+            true, Path.Combine(_dir, expectedName), DownloadErrorKind.None, null);
         var vm = NewVm();
         vm.ShareText = "https://v.douyin.com/h94R-IulXc8/";
         await vm.NextCommand.ExecuteAsync(null);
@@ -80,10 +81,43 @@ public class MainViewModelTests : IDisposable
         vm.FileName = "广场舞教学";
         await vm.DownloadVideoCommand.ExecuteAsync(null);
         Assert.Equal(MainViewModel.Step.Done, vm.CurrentStep);
-        Assert.Equal("001 中三 广场舞教学.mp4", vm.ResultFileName);
+        Assert.Equal(expectedName, vm.ResultFileName);
+        Assert.Equal(expectedName, _engine.LastRequest!.FileNameWithoutExtension + ".mp4");
         Assert.Single(vm.RecentDownloads);
         Assert.Equal(7, _settings.Load().LastNumber);
         Assert.Equal("中三", _settings.Load().LastType);
+    }
+
+    [Fact]
+    public async Task Download_Audio_Uses_Mp3_In_Request_Name()
+    {
+        _engine.Metadata = new VideoMetadata("广场舞教学");
+        var expectedName = FilenameBuilder.BuildFileName("007", "中三", "广场舞教学", "mp3");
+        _engine.DownloadResult = new DownloadResult(
+            true, Path.Combine(_dir, expectedName), DownloadErrorKind.None, null);
+        var vm = NewVm();
+        vm.ShareText = "https://v.douyin.com/h94R-IulXc8/";
+        await vm.NextCommand.ExecuteAsync(null);
+        vm.Number = "007";
+        vm.Type = "中三";
+        vm.FileName = "广场舞教学";
+        await vm.DownloadAudioCommand.ExecuteAsync(null);
+        Assert.Equal(MainViewModel.Step.Done, vm.CurrentStep);
+        Assert.Equal(expectedName, vm.ResultFileName);
+        Assert.Equal(expectedName, _engine.LastRequest!.FileNameWithoutExtension + ".mp3");
+    }
+
+    [Fact]
+    public async Task Download_With_Empty_Title_Shows_Error()
+    {
+        _engine.Metadata = new VideoMetadata("广场舞教学");
+        var vm = NewVm();
+        vm.ShareText = "https://v.douyin.com/h94R-IulXc8/";
+        await vm.NextCommand.ExecuteAsync(null);
+        vm.FileName = "";
+        await vm.DownloadVideoCommand.ExecuteAsync(null);
+        Assert.Equal("标题不能为空", vm.ErrorMessage);
+        Assert.Equal(MainViewModel.Step.Name, vm.CurrentStep);
     }
 
     [Fact]
