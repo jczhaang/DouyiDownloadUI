@@ -56,7 +56,8 @@ public sealed partial class SettingsViewModel : ObservableObject
     {
         var text = $"DouyiDownloadUI v{typeof(App).Assembly.GetName().Version}\n" +
                    $"保存位置：{SaveFolder}\n" +
-                   $"引擎版本：{EngineVersion}";
+                   $"引擎版本：{EngineVersion}\n" +
+                   $"日志目录：{LogService.LogDirectory}";
         System.Windows.Clipboard.SetText(text);
         UpdateStatus = "诊断信息已复制";
     }

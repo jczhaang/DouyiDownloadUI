@@ -190,9 +190,11 @@ public sealed partial class MainViewModel : ObservableObject
         });
         try
         {
+            LogService.Info($"开始下载：{request.FileNameWithoutExtension} ({mode})");
             var result = await _engine.DownloadAsync(request, progress, _cts.Token);
             if (!result.Success)
             {
+                LogService.Error($"下载失败：{result.ErrorKind} {result.ErrorDetail}");
                 ErrorMessage = FriendlyError(result);
                 return;
             }
