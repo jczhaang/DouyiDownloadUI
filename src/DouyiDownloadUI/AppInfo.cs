@@ -5,7 +5,7 @@ namespace DouyiDownloadUI;
 public static class AppInfo
 {
     public const string AppName = "抖音下载";
-    public const string GitHubRepo = "your-username/DouyiDownloadUI"; // Task 16 创建仓库后替换
+    public const string GitHubRepo = "jczhaang/DouyiDownloadUI";
     public static readonly string SettingsPath = Path.Combine(
         Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
         "DouyiDownloadUI",

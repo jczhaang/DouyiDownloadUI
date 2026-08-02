@@ -16,7 +16,7 @@ public partial class SettingsWindow : Window
         var updateChecker = new UpdateChecker(
             new System.Net.Http.HttpClient(),
             AppInfo.GitHubRepo,
-            typeof(App).Assembly.GetName().Version);
+            typeof(App).Assembly.GetName().Version ?? new Version(1, 0, 0));
         _viewModel = new SettingsViewModel(settings, updateChecker);
         DataContext = _viewModel;
     }

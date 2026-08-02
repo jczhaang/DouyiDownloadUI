@@ -1,0 +1,6 @@
+ffmpeg
+
+本安装包内置的 ffmpeg 来自 BtbN/FFmpeg-Builds（GPL 构建），
+依据 GNU General Public License（GPL）v3 分发。
+完整许可证文本见 https://www.gnu.org/licenses/gpl-3.0.txt
+源码获取方式：https://github.com/BtbN/FFmpeg-Builds
