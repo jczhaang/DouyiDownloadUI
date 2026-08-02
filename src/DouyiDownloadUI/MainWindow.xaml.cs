@@ -1,4 +1,7 @@
 using System.Windows;
+using System.Windows.Input;
+using DouyiDownloadUI.Core;
+using DouyiDownloadUI.Services;
 using DouyiDownloadUI.ViewModels;
 
 namespace DouyiDownloadUI;
@@ -30,5 +33,14 @@ public partial class MainWindow : Window
         window.Owner = this;
         window.ShowDialog();
         _viewModel.RefreshFromSettings();
+        FontManager.Apply(_viewModel.Settings.Load().FontSize, this);
+    }
+
+    private void RecentList_MouseDoubleClick(object sender, MouseButtonEventArgs e)
+    {
+        if (RecentList.SelectedItem is RecentDownloadEntry entry)
+        {
+            _viewModel.OpenRecent(entry);
+        }
     }
 }

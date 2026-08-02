@@ -25,6 +25,7 @@ public sealed partial class SettingsViewModel : ObservableObject
     {
         _settings = settings;
         _updateChecker = updateChecker;
+        EngineVersion = AppInfo.EngineVersion;
         Refresh();
     }
 
