@@ -7,6 +7,7 @@ namespace DouyiDownloadUI.ViewModels;
 public sealed partial class SettingsViewModel : ObservableObject
 {
     private readonly SettingsService _settings;
+    private readonly UpdateChecker _updateChecker;
 
     [ObservableProperty]
     private string _saveFolder = "";
@@ -20,9 +21,10 @@ public sealed partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private string _updateStatus = "";
 
-    public SettingsViewModel(SettingsService settings)
+    public SettingsViewModel(SettingsService settings, UpdateChecker updateChecker)
     {
         _settings = settings;
+        _updateChecker = updateChecker;
         Refresh();
     }
 
@@ -60,5 +62,17 @@ public sealed partial class SettingsViewModel : ObservableObject
                    $"日志目录：{LogService.LogDirectory}";
         System.Windows.Clipboard.SetText(text);
         UpdateStatus = "诊断信息已复制";
+    }
+
+    [RelayCommand]
+    private async Task CheckUpdateAsync()
+    {
+        UpdateStatus = "正在检查…";
+        var latest = await _updateChecker.GetLatestVersionAsync(CancellationToken.None);
+        UpdateStatus = latest is null
+            ? "检查失败（可能未联网）"
+            : latest > _updateChecker.CurrentVersion
+                ? $"发现新版本 {latest}，请到 GitHub Releases 下载新安装包"
+                : "已是最新版本";
     }
 }

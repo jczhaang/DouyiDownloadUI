@@ -13,7 +13,11 @@ public partial class SettingsWindow : Window
     {
         InitializeComponent();
         FontManager.Apply(settings.Load().FontSize, this);
-        _viewModel = new SettingsViewModel(settings);
+        var updateChecker = new UpdateChecker(
+            new System.Net.Http.HttpClient(),
+            AppInfo.GitHubRepo,
+            typeof(App).Assembly.GetName().Version);
+        _viewModel = new SettingsViewModel(settings, updateChecker);
         DataContext = _viewModel;
     }
 
