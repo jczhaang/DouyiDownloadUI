@@ -142,7 +142,7 @@ public sealed class YtDlpEngine : IDownloadEngine
         foreach (var file in Directory.EnumerateFiles(request.OutputDirectory))
         {
             var name = Path.GetFileNameWithoutExtension(file);
-            if (name.StartsWith(request.FileNameWithoutExtension, StringComparison.Ordinal))
+            if (string.Equals(name, request.FileNameWithoutExtension, StringComparison.Ordinal))
             {
                 return file;
             }

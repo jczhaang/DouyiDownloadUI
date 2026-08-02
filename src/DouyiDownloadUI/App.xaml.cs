@@ -15,11 +15,7 @@ public partial class App : Application
         DispatcherUnhandledException += (_, args) =>
         {
             LogService.Error("未处理异常", args.Exception);
-            MessageBox.Show(
-                "软件遇到问题，日志已保存",
-                "提示",
-                MessageBoxButton.OK,
-                MessageBoxImage.Warning);
+            new CrashWindow().ShowDialog();
             args.Handled = true;
         };
         CleanupOldLogs();
