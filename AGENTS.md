@@ -33,9 +33,9 @@
 
 ## 当前状态（2026-08-02）
 
-- 阶段：需求分析与设计已完成，规格文档已提交，等待用户审阅
-- 工作区：已 `git init`，有 `.gitignore`、`AGENTS.md`、设计文档
-- 待定决策：GitHub 仓库公开/私有、审阅后进入 writing-plans
+- 阶段：需求、设计、实施计划均已完成并提交；等待用户选择执行方式（subagent-driven / inline）
+- 工作区：已 `git init`，有 `.gitignore`、`AGENTS.md`、设计文档、实施计划
+- 待定决策：GitHub 仓库公开/私有与用户名、执行方式
 
 ## 已知风险与开放问题
 
