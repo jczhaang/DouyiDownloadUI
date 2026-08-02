@@ -1,0 +1,36 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{08CCE653-A022-490A-9F35-1009D2C63B6C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DouyiDownloadUI", "src\DouyiDownloadUI\DouyiDownloadUI.csproj", "{E8FBDE3A-4F40-400B-A189-CD5C1949409F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{634BF6AF-F90B-4CFD-BB62-6EF8C8A42BB2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DouyiDownloadUI.Tests", "tests\DouyiDownloadUI.Tests\DouyiDownloadUI.Tests.csproj", "{6D1931CA-8914-4A86-929F-340AB2F0467B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{E8FBDE3A-4F40-400B-A189-CD5C1949409F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E8FBDE3A-4F40-400B-A189-CD5C1949409F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E8FBDE3A-4F40-400B-A189-CD5C1949409F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E8FBDE3A-4F40-400B-A189-CD5C1949409F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6D1931CA-8914-4A86-929F-340AB2F0467B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6D1931CA-8914-4A86-929F-340AB2F0467B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6D1931CA-8914-4A86-929F-340AB2F0467B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6D1931CA-8914-4A86-929F-340AB2F0467B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E8FBDE3A-4F40-400B-A189-CD5C1949409F} = {08CCE653-A022-490A-9F35-1009D2C63B6C}
+		{6D1931CA-8914-4A86-929F-340AB2F0467B} = {634BF6AF-F90B-4CFD-BB62-6EF8C8A42BB2}
+	EndGlobalSection
+EndGlobal
