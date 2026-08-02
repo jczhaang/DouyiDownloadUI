@@ -16,7 +16,7 @@ public partial class App : Application
         var engine = new YtDlpEngine(AppInfo.EnginePath("yt-dlp.exe"), AppInfo.EnginePath("ffmpeg.exe"));
         var viewModel = new MainViewModel(engine, settings, new ClipboardService());
         _window = new MainWindow(viewModel);
-        // Task 12 解除注释：FontManager.Apply(config.FontSize, _window);
+        FontManager.Apply(config.FontSize, _window);
         _window.Show();
     }
 }

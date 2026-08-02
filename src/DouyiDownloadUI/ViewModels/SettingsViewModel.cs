@@ -1,0 +1,63 @@
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using DouyiDownloadUI.Services;
+
+namespace DouyiDownloadUI.ViewModels;
+
+public sealed partial class SettingsViewModel : ObservableObject
+{
+    private readonly SettingsService _settings;
+
+    [ObservableProperty]
+    private string _saveFolder = "";
+
+    [ObservableProperty]
+    private string _fontSize = "Large";
+
+    [ObservableProperty]
+    private string _engineVersion = "未知";
+
+    [ObservableProperty]
+    private string _updateStatus = "";
+
+    public SettingsViewModel(SettingsService settings)
+    {
+        _settings = settings;
+        Refresh();
+    }
+
+    public void Refresh()
+    {
+        var config = _settings.Load();
+        SaveFolder = config.SaveFolder;
+        FontSize = config.FontSize;
+    }
+
+    public void ApplySaveFolder(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path)) return;
+        var config = _settings.Load();
+        config.SaveFolder = path;
+        _settings.Save(config);
+        SaveFolder = path;
+    }
+
+    [RelayCommand]
+    private void SetFontSize(string size)
+    {
+        var config = _settings.Load();
+        config.FontSize = size;
+        _settings.Save(config);
+        FontSize = size;
+    }
+
+    [RelayCommand]
+    private void CopyDiagnostics()
+    {
+        var text = $"DouyiDownloadUI v{typeof(App).Assembly.GetName().Version}\n" +
+                   $"保存位置：{SaveFolder}\n" +
+                   $"引擎版本：{EngineVersion}";
+        System.Windows.Clipboard.SetText(text);
+        UpdateStatus = "诊断信息已复制";
+    }
+}

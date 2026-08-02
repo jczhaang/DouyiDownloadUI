@@ -26,10 +26,9 @@ public partial class MainWindow : Window
 
     private void Settings_Click(object sender, RoutedEventArgs e)
     {
-        // Task 12 解除注释：
-        // var window = new SettingsWindow(_viewModel.Settings);
-        // window.Owner = this;
-        // window.ShowDialog();
-        // _viewModel.RefreshFromSettings();
+        var window = new SettingsWindow(_viewModel.Settings);
+        window.Owner = this;
+        window.ShowDialog();
+        _viewModel.RefreshFromSettings();
     }
 }
