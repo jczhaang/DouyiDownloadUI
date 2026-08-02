@@ -8,6 +8,9 @@ TestResults/
 # Visual companion
 .superpowers/
 
+# Git worktrees
+.worktrees/
+
 # App runtime
 logs/
 *.log
