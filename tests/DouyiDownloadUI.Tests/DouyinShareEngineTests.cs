@@ -9,7 +9,13 @@ public class DouyinShareEngineTests : IDisposable
 {
     private const string ShareHtml = """
         <html><head><script>
-        window._ROUTER_DATA = {"loaderData":{"video_(id)\u002Fpage":{"ua":"Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)","videoInfoRes":{"item_list":[{"desc":"什么是Node.js 这期视频","video":{"play_addr":{"uri":"v0200fg10000d8uuhinog65i77g243bg","url_list":["https:\u002F\u002Faweme.snssdk.com\u002Faweme\u002Fv1\u002Fplaywm\u002F?line=0&logo_name=aweme_diversion_search&ratio=720p&video_id=v0200fg10000d8uuhinog65i77g243bg"]}}}}]}}};
+        window._ROUTER_DATA = {"loaderData":{"video_(id)\u002Fpage":{"ua":"Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)","videoInfoRes":{"item_list":[{"desc":"什么是Node.js 这期视频","aweme_type":0,"video":{"play_addr":{"uri":"v0200fg10000d8uuhinog65i77g243bg","url_list":["https:\u002F\u002Faweme.snssdk.com\u002Faweme\u002Fv1\u002Fplaywm\u002F?line=0&logo_name=aweme_diversion_search&ratio=720p&video_id=v0200fg10000d8uuhinog65i77g243bg"]}}}}]}}};
+        </script></head></html>
+        """;
+
+    private const string ImagePostHtml = """
+        <html><head><script>
+        window._ROUTER_DATA = {"loaderData":{"video_(id)\u002Fpage":{"videoInfoRes":{"item_list":[{"desc":"嗯嗯嗯嗯嗯","aweme_type":2,"images":[{"url_list":["https:\u002F\u002Fp3-sign.douyinpic.com\u002Fimage.jpeg"]}],"video":{"play_addr":{"uri":"https:\u002F\u002Fsf6-cdn-tos.douyinstatic.com\u002Fobj\u002Fies-music\u002F7430762194301651722.mp3","url_list":["https:\u002F\u002Faweme.snssdk.com\u002Faweme\u002Fv1\u002Fplaywm\u002F?video_id=xxx&ratio=720p&line=0"]}}}}]}}};
         </script></head></html>
         """;
 
@@ -39,6 +45,9 @@ public class DouyinShareEngineTests : IDisposable
 
     private static HttpResponseMessage Html() =>
         new(HttpStatusCode.OK) { Content = new StringContent(ShareHtml) };
+
+    private static HttpResponseMessage ImagePostHtmlResponse() =>
+        new(HttpStatusCode.OK) { Content = new StringContent(ImagePostHtml) };
 
     private static HttpResponseMessage Bytes(byte[] bytes) =>
         new(HttpStatusCode.OK) { Content = new ByteArrayContent(bytes) };
@@ -154,6 +163,46 @@ public class DouyinShareEngineTests : IDisposable
         Assert.NotNull(ffmpeg.LastStartInfo);
         Assert.Equal(Path.Combine(_dir, "ffmpeg.exe"), ffmpeg.LastStartInfo!.FileName);
         Assert.DoesNotContain(Directory.GetFiles(_dir), f => f.Contains(".douyi-tmp"));
+    }
+
+    [Fact]
+    public async Task GetMetadataAsync_Image_Post_Returns_IsImagePost_True()
+    {
+        _handler.Responder = _ => ImagePostHtmlResponse();
+
+        var meta = await NewEngine().GetMetadataAsync(
+            "https://v.douyin.com/asiKvCH0KHk/", CancellationToken.None);
+
+        Assert.NotNull(meta);
+        Assert.True(meta!.IsImagePost);
+        Assert.Equal("嗯嗯嗯嗯嗯", meta.Title);
+    }
+
+    [Fact]
+    public async Task DownloadAsync_Image_Post_Audio_Downloads_Mp3_Directly()
+    {
+        var musicBytes = new byte[] { 0x49, 0x44, 0x33, 0x03 };
+        _handler.Responder = url =>
+            url.Contains("douyinstatic.com") ? Bytes(musicBytes) : ImagePostHtmlResponse();
+
+        var result = await NewEngine().DownloadAsync(
+            Request(mode: DownloadMode.Audio), null, CancellationToken.None);
+
+        Assert.True(result.Success);
+        Assert.Equal("001 中三 舞.mp3", Path.GetFileName(result.FilePath!));
+        Assert.Equal(musicBytes.Length, new FileInfo(result.FilePath!).Length);
+    }
+
+    [Fact]
+    public async Task DownloadAsync_Image_Post_Video_Returns_VideoUnavailable()
+    {
+        _handler.Responder = _ => ImagePostHtmlResponse();
+
+        var result = await NewEngine().DownloadAsync(
+            Request(mode: DownloadMode.Video), null, CancellationToken.None);
+
+        Assert.False(result.Success);
+        Assert.Equal(DownloadErrorKind.VideoUnavailable, result.ErrorKind);
     }
 
     private sealed class FakeHttpHandler : HttpMessageHandler

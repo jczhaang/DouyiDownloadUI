@@ -43,7 +43,7 @@ public sealed class DouyinShareEngine : IDownloadEngine
             LogService.Error($"抖音分享页缺少标题：{shareUrl}");
             return null;
         }
-        return new VideoMetadata(title);
+        return new VideoMetadata(title, info.IsImagePost);
     }
 
     public async Task<DownloadResult> DownloadAsync(
@@ -69,6 +69,12 @@ public sealed class DouyinShareEngine : IDownloadEngine
                 false, null, DownloadErrorKind.VideoUnavailable, "页面中未找到播放地址");
         }
 
+        if (info.IsImagePost && request.Mode == DownloadMode.Video)
+        {
+            return new DownloadResult(
+                false, null, DownloadErrorKind.VideoUnavailable, "这是图文作品，没有视频可下载");
+        }
+
         var ext = request.Mode == DownloadMode.Audio ? "mp3" : "mp4";
         var unique = FilenameBuilder.MakeUnique(
             request.OutputDirectory, request.FileNameWithoutExtension, ext);
@@ -78,7 +84,15 @@ public sealed class DouyinShareEngine : IDownloadEngine
         {
             if (request.Mode == DownloadMode.Audio)
             {
-                await DownloadAudioAsync(info.PlayUrl, finalPath, progress, ct);
+                if (info.IsImagePost)
+                {
+                    // 图文作品：音乐 URL 已是 MP3，直接流式下载，无需 ffmpeg
+                    await DownloadVideoAsync(info.PlayUrl, finalPath, progress, ct);
+                }
+                else
+                {
+                    await DownloadAudioAsync(info.PlayUrl, finalPath, progress, ct);
+                }
             }
             else
             {
