@@ -8,6 +8,7 @@ AppId={{6A4B9E2C-3F1D-4E8A-9C5B-7D2A0F1B3E44}
 AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher={#MyAppPublisher}
+SetupIconFile=..\src\DouyiDownloadUI\assets\app.ico
 DefaultDirName={autopf}\DouyiDownloadUI
 DefaultGroupName={#MyAppName}
 OutputDir=Output

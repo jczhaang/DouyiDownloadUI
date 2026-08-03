@@ -5,9 +5,13 @@
     <UseWPF>true</UseWPF>
     <AssemblyName>DouyiDownloadUI</AssemblyName>
     <RootNamespace>DouyiDownloadUI</RootNamespace>
+    <ApplicationIcon>assets\app.ico</ApplicationIcon>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.3.2" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="assets\app.ico" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\tools\engine-version.json">
