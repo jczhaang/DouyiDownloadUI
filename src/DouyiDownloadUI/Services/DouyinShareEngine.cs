@@ -27,9 +27,23 @@ public sealed class DouyinShareEngine : IDownloadEngine
     public async Task<VideoMetadata?> GetMetadataAsync(string shareUrl, CancellationToken ct)
     {
         var html = await FetchSharePageAsync(shareUrl, ct);
-        if (html is null) return null;
+        if (html is null)
+        {
+            LogService.Error($"抖音分享页获取失败：{shareUrl}");
+            return null;
+        }
         var info = DouyinShareParser.Parse(html);
-        return info?.Title is { Length: > 0 } title ? new VideoMetadata(title) : null;
+        if (info is null)
+        {
+            LogService.Error($"抖音分享页未找到播放数据：{shareUrl}");
+            return null;
+        }
+        if (info.Title is not { Length: > 0 } title)
+        {
+            LogService.Error($"抖音分享页缺少标题：{shareUrl}");
+            return null;
+        }
+        return new VideoMetadata(title);
     }
 
     public async Task<DownloadResult> DownloadAsync(

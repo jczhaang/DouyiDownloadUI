@@ -135,6 +135,7 @@ public sealed partial class MainViewModel : ObservableObject
             var meta = await _engine.GetMetadataAsync(_extractedUrl, timeout.Token);
             if (meta is null)
             {
+                LogService.Error($"读取视频信息失败：{_extractedUrl}");
                 ErrorMessage = "读取视频信息失败，请检查网络或链接";
                 return;
             }
@@ -145,8 +146,9 @@ public sealed partial class MainViewModel : ObservableObject
             FileName = FilenameBuilder.Truncate(FilenameBuilder.Sanitize(meta.Title));
             CurrentStep = Step.Name;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            LogService.Error($"读取视频信息异常：{_extractedUrl}", ex);
             ErrorMessage = "读取视频信息失败，请检查网络或链接";
         }
         finally
