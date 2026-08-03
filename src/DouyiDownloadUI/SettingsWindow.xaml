@@ -61,7 +61,7 @@
             <StackPanel>
                 <TextBlock Text="ℹ️ 关于"/>
                 <TextBlock Margin="0,6,0,0" Foreground="#999"
-                           Text="版本 1.0.0 · 内置 yt-dlp（Unlicense）与 ffmpeg（GPL），许可声明见安装目录 licenses 文件夹"/>
+                           Text="版本 1.0.1 · 内置 yt-dlp（Unlicense）与 ffmpeg（GPL），许可声明见安装目录 licenses 文件夹"/>
             </StackPanel>
         </Border>
     </StackPanel>
