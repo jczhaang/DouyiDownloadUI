@@ -59,11 +59,15 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private string _resultFileName = "";
 
+    [ObservableProperty]
+    private bool _isImagePost;
+
     public ObservableCollection<string> RecentTypes { get; } = new();
     public ObservableCollection<RecentDownloadEntry> RecentDownloads { get; } = new();
     public SettingsService Settings { get; }
 
     public bool CanNext => LinkRecognized && !IsBusy;
+    public bool CanDownloadVideo => !IsImagePost;
     public bool StepIsPaste => CurrentStep == Step.Paste;
     public bool StepIsName => CurrentStep == Step.Name;
     public bool StepIsDone => CurrentStep == Step.Done;
@@ -83,6 +87,7 @@ public sealed partial class MainViewModel : ObservableObject
     partial void OnShareTextChanged(string value) => LinkRecognized = LinkParser.ExtractUrl(value) is not null;
     partial void OnLinkRecognizedChanged(bool value) => OnPropertyChanged(nameof(CanNext));
     partial void OnIsBusyChanged(bool value) => OnPropertyChanged(nameof(CanNext));
+    partial void OnIsImagePostChanged(bool value) => OnPropertyChanged(nameof(CanDownloadVideo));
 
     partial void OnCurrentStepChanged(Step value)
     {
@@ -140,6 +145,7 @@ public sealed partial class MainViewModel : ObservableObject
                 return;
             }
             Title = meta.Title;
+            IsImagePost = meta.IsImagePost;
             Number = NumberingService.GetDefaultNumber(_config.SaveFolder, _config.LastNumber)
                 .ToString("D3");
             Type = _config.LastType ?? "";
@@ -177,6 +183,11 @@ public sealed partial class MainViewModel : ObservableObject
             return;
         }
         if (_extractedUrl is null) return;
+        if (IsImagePost && mode == DownloadMode.Video)
+        {
+            ErrorMessage = "这是图文作品，没有视频可下载，请点「下载音频」";
+            return;
+        }
 
         ErrorMessage = "";
         IsBusy = true;
@@ -253,6 +264,7 @@ public sealed partial class MainViewModel : ObservableObject
         ErrorMessage = "";
         ProgressPercent = 0;
         ResultFileName = "";
+        IsImagePost = false;
         CurrentStep = Step.Paste;
     }
 

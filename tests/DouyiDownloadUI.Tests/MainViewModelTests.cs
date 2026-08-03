@@ -142,4 +142,40 @@ public class MainViewModelTests : IDisposable
         vm.SetFileNameFromSelection("什么是Node.js");
         Assert.Equal("什么是Node.js", vm.FileName);
     }
+
+    [Fact]
+    public async Task Next_With_Image_Post_Sets_IsImagePost_True()
+    {
+        _engine.Metadata = new VideoMetadata("图文标题", IsImagePost: true);
+        var vm = NewVm();
+        vm.ShareText = "https://v.douyin.com/asiKvCH0KHk/";
+        await vm.NextCommand.ExecuteAsync(null);
+
+        Assert.True(vm.IsImagePost);
+        Assert.False(vm.CanDownloadVideo);
+    }
+
+    [Fact]
+    public async Task Next_With_Video_Post_Sets_IsImagePost_False()
+    {
+        _engine.Metadata = new VideoMetadata("视频标题");
+        var vm = NewVm();
+        vm.ShareText = "https://v.douyin.com/h94R-IulXc8/";
+        await vm.NextCommand.ExecuteAsync(null);
+
+        Assert.False(vm.IsImagePost);
+        Assert.True(vm.CanDownloadVideo);
+    }
+
+    [Fact]
+    public void DownloadAnother_Resets_IsImagePost()
+    {
+        _engine.Metadata = new VideoMetadata("图文标题", IsImagePost: true);
+        var vm = NewVm();
+        vm.ShareText = "https://v.douyin.com/asiKvCH0KHk/";
+        vm.IsImagePost = true;
+        vm.DownloadAnotherCommand.Execute(null);
+
+        Assert.False(vm.IsImagePost);
+    }
 }
