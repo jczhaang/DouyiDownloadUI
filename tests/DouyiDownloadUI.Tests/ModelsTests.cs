@@ -20,4 +20,19 @@ public class ModelsTests
         Assert.Null(settings.LastNumber);
         Assert.Empty(settings.RecentTypes);
     }
+
+    [Fact]
+    public void VideoMetadata_Default_IsImagePost_Is_False()
+    {
+        var meta = new VideoMetadata("测试标题");
+        Assert.False(meta.IsImagePost);
+    }
+
+    [Fact]
+    public void VideoMetadata_With_IsImagePost_True()
+    {
+        var meta = new VideoMetadata("图文标题", IsImagePost: true);
+        Assert.True(meta.IsImagePost);
+        Assert.Equal("图文标题", meta.Title);
+    }
 }

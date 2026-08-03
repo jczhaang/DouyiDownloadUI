@@ -12,7 +12,7 @@ public enum DownloadErrorKind
     Canceled
 }
 
-public sealed record VideoMetadata(string Title);
+public sealed record VideoMetadata(string Title, bool IsImagePost = false);
 
 public sealed record DownloadRequest(
     string ShareUrl,
