@@ -15,6 +15,13 @@ TestResults/
 logs/
 *.log
 
+# Downloaded engine binaries (engine-version.json 保留提交)
+tools/*.exe
+tools/*.zip
+tools/ffmpeg-tmp/
+publish/
+installer/Output/
+
 # OS
 Thumbs.db
 .DS_Store

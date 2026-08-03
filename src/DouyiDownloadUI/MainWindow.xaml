@@ -1,0 +1,180 @@
+<Window x:Class="DouyiDownloadUI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:converters="clr-namespace:DouyiDownloadUI.Converters"
+        Title="抖音下载" Height="680" Width="560"
+        Icon="/assets/app.ico"
+        WindowStartupLocation="CenterScreen"
+        Activated="Window_Activated">
+    <Window.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <converters:RelativeTimeConverter x:Key="RelativeTime"/>
+    </Window.Resources>
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0">
+            <TextBlock Text="抖音下载" FontWeight="Bold" FontSize="28"/>
+            <Button Content="⚙ 设置" Padding="12,6"
+                    HorizontalAlignment="Right" Click="Settings_Click"/>
+        </DockPanel>
+
+        <StackPanel Grid.Row="1" Orientation="Horizontal"
+                    HorizontalAlignment="Center" Margin="0,12,0,8">
+            <Border Background="#4C8DFF" CornerRadius="12" Padding="10,4" Margin="0,0,4,0"
+                    Visibility="{Binding StepIsPaste, Converter={StaticResource BoolToVis}}">
+                <TextBlock Text="① 粘贴链接" Foreground="White"/>
+            </Border>
+            <Border Background="#E8ECF2" CornerRadius="12" Padding="10,4" Margin="0,0,4,0"
+                    Visibility="{Binding StepIsNameOrDone, Converter={StaticResource BoolToVis}}">
+                <TextBlock Text="① 粘贴链接 ✓"/>
+            </Border>
+            <TextBlock Text="→" VerticalAlignment="Center" Margin="2,0"/>
+            <Border Background="#4C8DFF" CornerRadius="12" Padding="10,4" Margin="4,0"
+                    Visibility="{Binding StepIsName, Converter={StaticResource BoolToVis}}">
+                <TextBlock Text="② 确认名字" Foreground="White"/>
+            </Border>
+            <Border Background="#E8ECF2" CornerRadius="12" Padding="10,4" Margin="4,0"
+                    Visibility="{Binding StepIsPaste, Converter={StaticResource BoolToVis}}">
+                <TextBlock Text="② 确认名字"/>
+            </Border>
+            <Border Background="#E8ECF2" CornerRadius="12" Padding="10,4" Margin="4,0"
+                    Visibility="{Binding StepIsDone, Converter={StaticResource BoolToVis}}">
+                <TextBlock Text="② 确认名字 ✓"/>
+            </Border>
+            <TextBlock Text="→" VerticalAlignment="Center" Margin="2,0"/>
+            <Border Background="#34C759" CornerRadius="12" Padding="10,4" Margin="4,0,0,0"
+                    Visibility="{Binding StepIsDone, Converter={StaticResource BoolToVis}}">
+                <TextBlock Text="③ 完成" Foreground="White"/>
+            </Border>
+            <Border Background="#E8ECF2" CornerRadius="12" Padding="10,4" Margin="4,0,0,0"
+                    Visibility="{Binding StepIsName, Converter={StaticResource BoolToVis}}">
+                <TextBlock Text="③ 完成"/>
+            </Border>
+        </StackPanel>
+
+        <Grid Grid.Row="2" Margin="0,4">
+            <!-- 第①步 -->
+            <StackPanel Visibility="{Binding StepIsPaste, Converter={StaticResource BoolToVis}}">
+                <TextBlock Text="从抖音复制后，直接粘贴到这里："/>
+                <TextBox x:Name="ShareTextBox" Height="150" Margin="0,8,0,0"
+                         AcceptsReturn="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"
+                         Padding="8"
+                         Text="{Binding ShareText, UpdateSourceTrigger=PropertyChanged}"/>
+                <TextBlock Margin="0,8,0,0" FontWeight="Bold"
+                           Foreground="#34C759"
+                           Text="✓ 已识别到抖音视频"
+                           Visibility="{Binding LinkRecognized, Converter={StaticResource BoolToVis}}"/>
+                <TextBlock Margin="0,8,0,0" Foreground="#C0392B"
+                           Text="{Binding ErrorMessage}"/>
+                <Button Content="下一步" FontWeight="Bold" Height="56"
+                        Margin="0,14,0,0" Background="#4C8DFF" Foreground="White"
+                        Command="{Binding NextCommand}"
+                        IsEnabled="{Binding CanNext}"/>
+                <TextBlock Margin="0,8,0,0" Foreground="#666"
+                           Text="{Binding StatusMessage}"/>
+            </StackPanel>
+
+            <!-- 第②步 -->
+            <StackPanel Visibility="{Binding StepIsName, Converter={StaticResource BoolToVis}}">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="72"/>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Grid.Column="0" Margin="0,0,6,0">
+                        <TextBlock Text="编号"/>
+                        <TextBox Text="{Binding Number, UpdateSourceTrigger=PropertyChanged}"
+                                 Padding="6" TextAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="1" Margin="0,0,6,0">
+                        <TextBlock Text="类型"/>
+                        <TextBox Text="{Binding Type, UpdateSourceTrigger=PropertyChanged}"
+                                 Padding="6"/>
+                    </StackPanel>
+                    <StackPanel Grid.Column="2">
+                        <TextBlock Text="标题（可直接打字修改）"/>
+                        <TextBox Text="{Binding FileName, UpdateSourceTrigger=PropertyChanged}"
+                                 Padding="6"/>
+                    </StackPanel>
+                </Grid>
+                <TextBlock Text="原标题（用鼠标选中想要的字，会自动填到上面）"
+                           Margin="0,14,0,0"/>
+                <TextBox x:Name="TitleTextBox" Height="110" Margin="0,6,0,0"
+                         IsReadOnly="True" AcceptsReturn="True" TextWrapping="Wrap"
+                         VerticalScrollBarVisibility="Auto" Padding="6"
+                         Text="{Binding Title, Mode=OneWay}"
+                         SelectionChanged="Title_SelectionChanged"/>
+                <TextBlock Text="选择要下载的内容：" Margin="0,14,0,0"/>
+                <Grid Margin="0,8,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Content="下载视频" FontWeight="Bold"
+                            Height="54" Margin="0,0,6,0" Background="#4C8DFF" Foreground="White"
+                            Command="{Binding DownloadVideoCommand}"/>
+                    <Button Grid.Column="1" Content="下载音频" FontWeight="Bold"
+                            Height="54" Margin="6,0,0,0" Background="#FF9F43" Foreground="White"
+                            Command="{Binding DownloadAudioCommand}"/>
+                </Grid>
+                <ProgressBar Height="18" Margin="0,14,0,0" Minimum="0" Maximum="100"
+                             Value="{Binding ProgressPercent}"/>
+                <TextBlock Margin="0,6,0,0" Foreground="#666"
+                           Text="{Binding ProgressText}"/>
+                <TextBlock Margin="0,6,0,0" Foreground="#C0392B"
+                           Text="{Binding ErrorMessage}"/>
+                <Button Content="取消" HorizontalAlignment="Right"
+                        Background="Transparent" BorderThickness="0" Foreground="#888"
+                        Command="{Binding CancelDownloadCommand}"/>
+            </StackPanel>
+
+            <!-- 第③步 -->
+            <StackPanel Visibility="{Binding StepIsDone, Converter={StaticResource BoolToVis}}">
+                <TextBlock Text="✓" FontSize="56" Foreground="#34C759" HorizontalAlignment="Center"/>
+                <TextBlock Text="下载完成！" FontWeight="Bold"
+                           HorizontalAlignment="Center" Margin="0,6,0,0"/>
+                <TextBlock Text="{Binding ResultFileName}" Foreground="#666"
+                           HorizontalAlignment="Center" Margin="0,8,0,0" TextWrapping="Wrap"/>
+                <Grid Margin="0,18,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0" Content="📁 打开文件夹" FontWeight="Bold"
+                            Height="52" Margin="0,0,6,0" Background="#4C8DFF" Foreground="White"
+                            Command="{Binding OpenFolderCommand}"/>
+                    <Button Grid.Column="1" Content="再下载一个"
+                            Height="52" Margin="6,0,0,0" BorderBrush="#4C8DFF"
+                            Foreground="#4C8DFF" Command="{Binding DownloadAnotherCommand}"/>
+                </Grid>
+            </StackPanel>
+        </Grid>
+
+        <StackPanel Grid.Row="3" Margin="0,10,0,0">
+            <TextBlock Text="最近下载（双击可定位文件）" FontWeight="Bold"/>
+            <ListView x:Name="RecentList" MaxHeight="150" Margin="0,6,0,0"
+                      ItemsSource="{Binding RecentDownloads}"
+                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                      MouseDoubleClick="RecentList_MouseDoubleClick">
+                <ListView.ItemTemplate>
+                    <DataTemplate>
+                        <StackPanel>
+                            <TextBlock Text="{Binding FileName}" TextTrimming="CharacterEllipsis"/>
+                            <TextBlock Text="{Binding DownloadedAt, Converter={StaticResource RelativeTime}}"
+                                       Foreground="#999" FontSize="12"/>
+                        </StackPanel>
+                    </DataTemplate>
+                </ListView.ItemTemplate>
+            </ListView>
+            <Button Content="📁 打开下载文件夹" Height="40" Margin="0,8,0,0"
+                    HorizontalAlignment="Right" Command="{Binding OpenFolderCommand}"/>
+        </StackPanel>
+    </Grid>
+</Window>

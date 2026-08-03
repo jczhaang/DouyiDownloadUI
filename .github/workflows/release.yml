@@ -1,0 +1,42 @@
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: Publish
+        run: dotnet publish src/DouyiDownloadUI/DouyiDownloadUI.csproj -c Release -r win-x64 --self-contained true -o publish
+      - name: Download engines
+        shell: pwsh
+        run: ./scripts/download-engine.ps1 -ConfigFile tools/engine-version.json -OutDir tools
+      - name: Install Inno Setup
+        run: choco install innosetup --no-progress -y
+      - name: Compile installer
+        shell: pwsh
+        run: |
+          $version = $env:GITHUB_REF_NAME.TrimStart('v')
+          & "C:\Program Files (x86)\Inno Setup 6\ISCC.exe" installer\installer.iss /DMyAppVersion=$version
+      - name: Generate checksum
+        shell: pwsh
+        run: |
+          $file = Get-ChildItem installer\Output\DouyiDownloadUI-*.exe | Select-Object -First 1
+          Get-FileHash $file.FullName -Algorithm SHA256 | ForEach-Object {
+            "$($_.Hash)  $($file.Name)" | Set-Content -Path "$($file.FullName).sha256"
+          }
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            installer/Output/DouyiDownloadUI-*.exe
+            installer/Output/DouyiDownloadUI-*.sha256
+          body_path: CHANGELOG.md
