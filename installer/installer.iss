@@ -1,5 +1,7 @@
 #define MyAppName "抖音下载"
-#define MyAppVersion "1.0.0"
+#ifndef MyAppVersion
+#define MyAppVersion "1.0.1"
+#endif
 #define MyAppPublisher "jczhaang"
 #define MyAppExeName "DouyiDownloadUI.exe"
 
