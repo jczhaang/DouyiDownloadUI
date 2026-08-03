@@ -2,6 +2,7 @@ using System.Windows;
 using DouyiDownloadUI.Services;
 using DouyiDownloadUI.ViewModels;
 using System.IO;
+using System.Net.Http;
 
 namespace DouyiDownloadUI;
 
@@ -21,7 +22,11 @@ public partial class App : Application
         CleanupOldLogs();
         var settings = new SettingsService(AppInfo.SettingsPath);
         var config = settings.Load();
-        var engine = new YtDlpEngine(AppInfo.EnginePath("yt-dlp.exe"), AppInfo.EnginePath("ffmpeg.exe"));
+        var ytDlpEngine = new YtDlpEngine(
+            AppInfo.EnginePath("yt-dlp.exe"), AppInfo.EnginePath("ffmpeg.exe"));
+        var shareEngine = new DouyinShareEngine(
+            new HttpClient(), AppInfo.EnginePath("ffmpeg.exe"));
+        var engine = new FallbackDownloadEngine(shareEngine, ytDlpEngine);
         var viewModel = new MainViewModel(engine, settings, new ClipboardService());
         _window = new MainWindow(viewModel);
         FontManager.Apply(config.FontSize, _window);
