@@ -2,7 +2,7 @@ using System.Text.RegularExpressions;
 
 namespace DouyiDownloadUI.Core;
 
-public sealed record DouyinShareInfo(string? Title, string? PlayUrl);
+public sealed record DouyinShareInfo(string? Title, string? PlayUrl, bool IsImagePost);
 
 public static partial class DouyinShareParser
 {
@@ -21,7 +21,20 @@ public static partial class DouyinShareParser
         var playUrl = Unescape(playMatch.Groups["url"].Value);
         var descMatch = DescPattern().Match(html);
         var title = descMatch.Success ? Unescape(descMatch.Groups["desc"].Value).Trim() : null;
-        return new DouyinShareInfo(title, playUrl);
+
+        var typeMatch = AwemeTypePattern().Match(html);
+        var isImagePost = typeMatch.Success && typeMatch.Groups["type"].Value == "2";
+
+        if (isImagePost)
+        {
+            var uriMatch = PlayUriPattern().Match(html);
+            if (uriMatch.Success)
+            {
+                playUrl = Unescape(uriMatch.Groups["uri"].Value);
+            }
+        }
+
+        return new DouyinShareInfo(title, playUrl, isImagePost);
     }
 
     private static string Unescape(string value)
@@ -37,6 +50,12 @@ public static partial class DouyinShareParser
 
     [GeneratedRegex(@"""play_addr"":\{[^}]*?""url_list"":\[""(?<url>https?:[^""]+)""")]
     private static partial Regex PlayUrlPattern();
+
+    [GeneratedRegex(@"""play_addr"":\{[^}]*?""uri"":""(?<uri>[^""]+)""")]
+    private static partial Regex PlayUriPattern();
+
+    [GeneratedRegex(@"""aweme_type"":(?<type>\d+)")]
+    private static partial Regex AwemeTypePattern();
 
     [GeneratedRegex(@"""desc"":""(?<desc>[^""]*)""")]
     private static partial Regex DescPattern();
