@@ -119,11 +119,15 @@
                     </Grid.ColumnDefinitions>
                     <Button Grid.Column="0" Content="下载视频" FontWeight="Bold"
                             Height="54" Margin="0,0,6,0" Background="#4C8DFF" Foreground="White"
-                            Command="{Binding DownloadVideoCommand}"/>
+                            Command="{Binding DownloadVideoCommand}"
+                            IsEnabled="{Binding CanDownloadVideo}"/>
                     <Button Grid.Column="1" Content="下载音频" FontWeight="Bold"
                             Height="54" Margin="6,0,0,0" Background="#FF9F43" Foreground="White"
                             Command="{Binding DownloadAudioCommand}"/>
                 </Grid>
+                <TextBlock Margin="0,8,0,0" Foreground="#FF9F43" FontWeight="Bold"
+                           Text="这是图文作品，只有背景音乐可下载"
+                           Visibility="{Binding IsImagePost, Converter={StaticResource BoolToVis}}"/>
                 <ProgressBar Height="18" Margin="0,14,0,0" Minimum="0" Maximum="100"
                              Value="{Binding ProgressPercent}"/>
                 <TextBlock Margin="0,6,0,0" Foreground="#666"
