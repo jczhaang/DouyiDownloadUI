@@ -1,5 +1,7 @@
+using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using DouyiDownloadUI.Core;
 using DouyiDownloadUI.Services;
 
 namespace DouyiDownloadUI.ViewModels;
@@ -21,6 +23,11 @@ public sealed partial class SettingsViewModel : ObservableObject
     [ObservableProperty]
     private string _updateStatus = "";
 
+    [ObservableProperty]
+    private string _newType = "";
+
+    public ObservableCollection<string> TypeOptions { get; } = new();
+
     public SettingsViewModel(SettingsService settings, UpdateChecker updateChecker)
     {
         _settings = settings;
@@ -34,6 +41,8 @@ public sealed partial class SettingsViewModel : ObservableObject
         var config = _settings.Load();
         SaveFolder = config.SaveFolder;
         FontSize = config.FontSize;
+        TypeOptions.Clear();
+        foreach (var t in config.TypeOptions) TypeOptions.Add(t);
     }
 
     public void ApplySaveFolder(string path)
@@ -52,6 +61,28 @@ public sealed partial class SettingsViewModel : ObservableObject
         config.FontSize = size;
         _settings.Save(config);
         FontSize = size;
+    }
+
+    [RelayCommand]
+    private void AddType()
+    {
+        var trimmed = NewType.Trim();
+        if (trimmed.Length == 0) return;
+        if (TypeOptions.Contains(trimmed)) return;
+        var config = _settings.Load();
+        config.TypeOptions.Add(trimmed);
+        _settings.Save(config);
+        TypeOptions.Add(trimmed);
+        NewType = "";
+    }
+
+    [RelayCommand]
+    private void RemoveType(string type)
+    {
+        var config = _settings.Load();
+        config.TypeOptions.Remove(type);
+        _settings.Save(config);
+        TypeOptions.Remove(type);
     }
 
     [RelayCommand]

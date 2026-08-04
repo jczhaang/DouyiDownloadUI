@@ -18,7 +18,9 @@ public sealed class SettingsService
             var json = File.ReadAllText(_filePath);
             var settings = JsonSerializer.Deserialize<AppSettings>(json);
             if (settings is null) return CreateDefault();
-            settings.RecentTypes ??= new List<string>();
+            settings.TypeOptions ??= new List<string>(AppSettings.DefaultTypeOptions);
+            if (settings.TypeOptions.Count == 0)
+                settings.TypeOptions = new List<string>(AppSettings.DefaultTypeOptions);
             settings.RecentDownloads ??= new List<RecentDownloadEntry>();
             if (string.IsNullOrWhiteSpace(settings.SaveFolder)) settings.SaveFolder = DefaultSaveFolder();
             return settings;
@@ -40,7 +42,7 @@ public sealed class SettingsService
     {
         SaveFolder = DefaultSaveFolder(),
         FontSize = "Large",
-        RecentTypes = new List<string>(),
+        TypeOptions = new List<string>(AppSettings.DefaultTypeOptions),
         RecentDownloads = new List<RecentDownloadEntry>()
     };
 

@@ -95,8 +95,10 @@
                     </StackPanel>
                     <StackPanel Grid.Column="1" Margin="0,0,6,0">
                         <TextBlock Text="类型"/>
-                        <TextBox Text="{Binding Type, UpdateSourceTrigger=PropertyChanged}"
-                                 Padding="6"/>
+                        <ComboBox IsEditable="False"
+                                  ItemsSource="{Binding TypeOptions}"
+                                  SelectedItem="{Binding Type}"
+                                  Padding="6"/>
                     </StackPanel>
                     <StackPanel Grid.Column="2">
                         <TextBlock Text="标题（可直接打字修改）"/>
