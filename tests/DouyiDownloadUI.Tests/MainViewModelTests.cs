@@ -62,7 +62,7 @@ public class MainViewModelTests : IDisposable
         await vm.NextCommand.ExecuteAsync(null);
         Assert.Equal(MainViewModel.Step.Name, vm.CurrentStep);
         Assert.Equal("001", vm.Number);
-        Assert.Equal("", vm.Type);
+        Assert.Equal("中三", vm.Type);
         Assert.Equal(FilenameBuilder.Truncate(new string('长', 40)), vm.FileName);
     }
 
@@ -177,5 +177,46 @@ public class MainViewModelTests : IDisposable
         vm.DownloadAnotherCommand.Execute(null);
 
         Assert.False(vm.IsImagePost);
+    }
+
+    [Fact]
+    public async Task Next_With_Link_Populates_TypeOptions()
+    {
+        _engine.Metadata = new VideoMetadata("广场舞教学");
+        var vm = NewVm();
+        vm.ShareText = "https://v.douyin.com/h94R-IulXc8/";
+        await vm.NextCommand.ExecuteAsync(null);
+
+        Assert.NotEmpty(vm.TypeOptions);
+        Assert.Contains("中三", vm.TypeOptions);
+        Assert.Contains("其他", vm.TypeOptions);
+    }
+
+    [Fact]
+    public async Task Next_Defaults_Type_To_LastType_When_Available()
+    {
+        _engine.Metadata = new VideoMetadata("广场舞教学");
+        var config = _settings.Load();
+        config.LastType = "平四";
+        _settings.Save(config);
+        var vm = NewVm();
+        vm.ShareText = "https://v.douyin.com/h94R-IulXc8/";
+        await vm.NextCommand.ExecuteAsync(null);
+
+        Assert.Equal("平四", vm.Type);
+    }
+
+    [Fact]
+    public async Task Next_Defaults_Type_To_First_When_LastType_Not_In_Options()
+    {
+        _engine.Metadata = new VideoMetadata("广场舞教学");
+        var config = _settings.Load();
+        config.LastType = "已删除的类型";
+        _settings.Save(config);
+        var vm = NewVm();
+        vm.ShareText = "https://v.douyin.com/h94R-IulXc8/";
+        await vm.NextCommand.ExecuteAsync(null);
+
+        Assert.Equal("中三", vm.Type);
     }
 }

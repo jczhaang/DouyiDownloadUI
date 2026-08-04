@@ -36,10 +36,13 @@ public sealed record RecentDownloadEntry(
 
 public sealed class AppSettings
 {
+    public static readonly List<string> DefaultTypeOptions =
+        new() { "中三", "中四", "平四", "三步", "其他" };
+
     public string SaveFolder { get; set; } = "";
     public string FontSize { get; set; } = "Large";
     public int? LastNumber { get; set; }
     public string? LastType { get; set; }
-    public List<string> RecentTypes { get; set; } = new();
+    public List<string> TypeOptions { get; set; } = new(DefaultTypeOptions);
     public List<RecentDownloadEntry> RecentDownloads { get; set; } = new();
 }

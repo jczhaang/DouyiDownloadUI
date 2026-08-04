@@ -18,7 +18,18 @@ public class ModelsTests
         var settings = new AppSettings();
         Assert.Equal("Large", settings.FontSize);
         Assert.Null(settings.LastNumber);
-        Assert.Empty(settings.RecentTypes);
+    }
+
+    [Fact]
+    public void AppSettings_Default_TypeOptions_Has_Five_Presets()
+    {
+        var settings = new AppSettings();
+        Assert.Equal(5, settings.TypeOptions.Count);
+        Assert.Equal("中三", settings.TypeOptions[0]);
+        Assert.Equal("中四", settings.TypeOptions[1]);
+        Assert.Equal("平四", settings.TypeOptions[2]);
+        Assert.Equal("三步", settings.TypeOptions[3]);
+        Assert.Equal("其他", settings.TypeOptions[4]);
     }
 
     [Fact]

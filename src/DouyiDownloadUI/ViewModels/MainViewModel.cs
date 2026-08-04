@@ -62,7 +62,7 @@ public sealed partial class MainViewModel : ObservableObject
     [ObservableProperty]
     private bool _isImagePost;
 
-    public ObservableCollection<string> RecentTypes { get; } = new();
+    public ObservableCollection<string> TypeOptions { get; } = new();
     public ObservableCollection<RecentDownloadEntry> RecentDownloads { get; } = new();
     public SettingsService Settings { get; }
 
@@ -80,7 +80,7 @@ public sealed partial class MainViewModel : ObservableObject
         _clipboard = clipboard;
         Settings = settings;
         _config = settings.Load();
-        RefreshRecentTypes();
+        RefreshTypeOptions();
         RefreshRecentDownloads();
     }
 
@@ -117,7 +117,7 @@ public sealed partial class MainViewModel : ObservableObject
     public void RefreshFromSettings()
     {
         _config = _settings.Load();
-        RefreshRecentTypes();
+        RefreshTypeOptions();
         RefreshRecentDownloads();
     }
 
@@ -148,7 +148,9 @@ public sealed partial class MainViewModel : ObservableObject
             IsImagePost = meta.IsImagePost;
             Number = NumberingService.GetDefaultNumber(_config.SaveFolder, _config.LastNumber)
                 .ToString("D3");
-            Type = _config.LastType ?? "";
+            Type = !string.IsNullOrEmpty(_config.LastType) && _config.TypeOptions.Contains(_config.LastType)
+                ? _config.LastType
+                : (_config.TypeOptions.Count > 0 ? _config.TypeOptions[0] : "");
             FileName = FilenameBuilder.Truncate(FilenameBuilder.Sanitize(meta.Title));
             CurrentStep = Step.Name;
         }
@@ -219,7 +221,6 @@ public sealed partial class MainViewModel : ObservableObject
             var finalName = Path.GetFileName(result.FilePath!);
             _config.LastNumber = number;
             if (!string.IsNullOrWhiteSpace(Type)) _config.LastType = Type.Trim();
-            RememberType(Type);
             _config.RecentDownloads.Insert(
                 0,
                 new RecentDownloadEntry(
@@ -312,19 +313,10 @@ public sealed partial class MainViewModel : ObservableObject
         }
     }
 
-    private void RememberType(string type)
+    private void RefreshTypeOptions()
     {
-        var trimmed = type.Trim();
-        if (trimmed.Length == 0) return;
-        if (!_config.RecentTypes.Contains(trimmed)) _config.RecentTypes.Add(trimmed);
-        if (_config.RecentTypes.Count > 10) _config.RecentTypes.RemoveRange(10, _config.RecentTypes.Count - 10);
-        RefreshRecentTypes();
-    }
-
-    private void RefreshRecentTypes()
-    {
-        RecentTypes.Clear();
-        foreach (var type in _config.RecentTypes) RecentTypes.Add(type);
+        TypeOptions.Clear();
+        foreach (var type in _config.TypeOptions) TypeOptions.Add(type);
     }
 
     private void RefreshRecentDownloads()
