@@ -50,6 +50,18 @@ public sealed class FallbackDownloadEngine : IDownloadEngine
             result = new DownloadResult(false, null, DownloadErrorKind.EngineError, "主引擎异常");
         }
         if (result.Success || result.ErrorKind == DownloadErrorKind.Canceled) return result;
-        return await _fallback.DownloadAsync(request, progress, ct);
+        try
+        {
+            return await _fallback.DownloadAsync(request, progress, ct);
+        }
+        catch (OperationCanceledException)
+        {
+            throw;
+        }
+        catch (Exception ex)
+        {
+            return new DownloadResult(
+                false, null, DownloadErrorKind.EngineError, $"兜底引擎异常：{ex.Message}");
+        }
     }
 }

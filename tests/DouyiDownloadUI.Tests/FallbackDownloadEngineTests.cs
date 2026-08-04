@@ -29,6 +29,18 @@ public class FallbackDownloadEngineTests
         }
     }
 
+    private sealed class ThrowingEngine : IDownloadEngine
+    {
+        public Exception Exception { get; set; } = new("boom");
+
+        public Task<VideoMetadata?> GetMetadataAsync(string shareUrl, CancellationToken ct)
+            => throw Exception;
+
+        public Task<DownloadResult> DownloadAsync(
+            DownloadRequest request, IProgress<DownloadProgress>? progress, CancellationToken ct)
+            => throw Exception;
+    }
+
     private static DownloadRequest Request() =>
         new("u", "d", "n", DownloadMode.Video);
 
@@ -91,5 +103,24 @@ public class FallbackDownloadEngineTests
 
         Assert.Equal(DownloadErrorKind.Canceled, result.ErrorKind);
         Assert.Equal(0, fallback.DownloadCalls);
+    }
+
+    [Fact]
+    public async Task DownloadAsync_Catches_Fallback_Exception()
+    {
+        var primary = new RecordingEngine
+        {
+            Result = new DownloadResult(false, null, DownloadErrorKind.EngineError, "x")
+        };
+        var fallback = new ThrowingEngine
+        {
+            Exception = new System.ComponentModel.Win32Exception("file not found")
+        };
+        var engine = new FallbackDownloadEngine(primary, fallback);
+
+        var result = await engine.DownloadAsync(Request(), null, CancellationToken.None);
+
+        Assert.False(result.Success);
+        Assert.Equal(DownloadErrorKind.EngineError, result.ErrorKind);
     }
 }
