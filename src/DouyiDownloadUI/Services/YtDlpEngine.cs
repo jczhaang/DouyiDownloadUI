@@ -81,6 +81,16 @@ public sealed class YtDlpEngine : IDownloadEngine
             CleanupPartial(safeRequest);
             return new DownloadResult(false, null, DownloadErrorKind.Canceled, "已取消");
         }
+        catch (System.ComponentModel.Win32Exception ex)
+        {
+            return new DownloadResult(
+                false, null, DownloadErrorKind.EngineError, $"yt-dlp 启动失败：{ex.Message}");
+        }
+        catch (Exception ex)
+        {
+            return new DownloadResult(
+                false, null, DownloadErrorKind.EngineError, $"yt-dlp 异常：{ex.Message}");
+        }
 
         if (exitCode != 0)
         {

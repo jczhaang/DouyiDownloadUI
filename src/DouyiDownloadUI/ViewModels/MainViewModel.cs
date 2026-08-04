@@ -235,8 +235,9 @@ public sealed partial class MainViewModel : ObservableObject
             ResultFileName = finalName;
             CurrentStep = Step.Done;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            LogService.Error($"下载异常：{request.FileNameWithoutExtension} ({mode})", ex);
             ErrorMessage = "下载出错，请重试";
         }
         finally
