@@ -15,11 +15,11 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: '8.0.x'
-      - name: Publish
-        run: dotnet publish src/DouyiDownloadUI/DouyiDownloadUI.csproj -c Release -r win-x64 --self-contained true -o publish
       - name: Download engines
         shell: pwsh
         run: ./scripts/download-engine.ps1 -ConfigFile tools/engine-version.json -OutDir tools
+      - name: Publish
+        run: dotnet publish src/DouyiDownloadUI/DouyiDownloadUI.csproj -c Release -r win-x64 --self-contained true -o publish
       - name: Install Inno Setup
         run: choco install innosetup --no-progress -y
       - name: Compile installer
